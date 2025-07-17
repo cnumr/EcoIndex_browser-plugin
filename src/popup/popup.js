@@ -1,17 +1,15 @@
-/* eslint-disable no-console */
-/* eslint-disable import/extensions */
 import {
-  FETCH_ID_TASK_URL,
-  FETCH_RESULT_ECOINDEX_URL,
-  FETCH_RESULT_URL,
-  FETCH_SCREENSHOT_URL,
-  FETCH_TASK_URL,
-  getBrowserPolyfill,
-  setBadgeLocalStorage,
-} from '../common.js';
+	FETCH_ID_TASK_URL,
+	FETCH_RESULT_ECOINDEX_URL,
+	FETCH_RESULT_URL,
+	FETCH_SCREENSHOT_URL,
+	FETCH_TASK_URL,
+	getBrowserPolyfill,
+	setBadgeLocalStorage,
+} from "../common.js";
 
 let tabUrl;
-const domTitle = document.getElementById('title');
+const domTitle = document.getElementById("title");
 const currentBrowser = getBrowserPolyfill();
 
 /**
@@ -20,12 +18,12 @@ const currentBrowser = getBrowserPolyfill();
  * @param any detail
  */
 function displayError(title, detail) {
-  document.getElementById('loader').style.display = 'none';
-  const errorTitle = document.querySelector('#error summary');
-  const errorDetail = document.querySelector('#error code');
-  errorDetail.textContent = detail;
-  errorTitle.textContent = title;
-  document.getElementById('error').style.display = 'block';
+	document.getElementById("loader").style.display = "none";
+	const errorTitle = document.querySelector("#error summary");
+	const errorDetail = document.querySelector("#error code");
+	errorDetail.textContent = detail;
+	errorTitle.textContent = title;
+	document.getElementById("error").style.display = "block";
 }
 
 /**
@@ -33,8 +31,11 @@ function displayError(title, detail) {
  * @param Error error
  */
 function handleApiError(error) {
-  console.error(error);
-  displayError("Une erreur est survenue en essayant de récupérer les données de l'API", error.message);
+	console.error(error);
+	displayError(
+		"Une erreur est survenue en essayant de récupérer les données de l'API",
+		error.message,
+	);
 }
 
 /**
@@ -42,10 +43,10 @@ function handleApiError(error) {
  * @param string message
  */
 function proposeAnalysis(message) {
-  const noAnalyzis = document.getElementById('no-analysis');
-  domTitle.textContent = message;
-  noAnalyzis.style.display = 'block';
-  domTitle.style.display = 'block';
+	const noAnalyzis = document.getElementById("no-analysis");
+	domTitle.textContent = message;
+	noAnalyzis.style.display = "block";
+	domTitle.style.display = "block";
 }
 
 /**
@@ -54,13 +55,13 @@ function proposeAnalysis(message) {
  * @returns string
  */
 function convertDate(date) {
-  return new Date(date).toLocaleDateString('fr-FR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-  });
+	return new Date(date).toLocaleDateString("fr-FR", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+		hour: "numeric",
+		minute: "numeric",
+	});
 }
 
 /**
@@ -68,19 +69,19 @@ function convertDate(date) {
  * @param string id
  */
 function displayImage(id) {
-  fetch(FETCH_SCREENSHOT_URL(id))
-    .then((response) => {
-      if (response.status !== 200) {
-        throw new Error(`Pas de screenshot pour l'analyse ${id}`);
-      }
-      return response.blob();
-    })
-    .then((imageBlob) => {
-      const screenshot = document.getElementById('screenshot');
-      screenshot.setAttribute('src', URL.createObjectURL(imageBlob));
-      screenshot.style.display = 'block';
-    })
-    .catch((error) => console.error(error));
+	fetch(FETCH_SCREENSHOT_URL(id))
+		.then((response) => {
+			if (response.status !== 200) {
+				throw new Error(`Pas de screenshot pour l'analyse ${id}`);
+			}
+			return response.blob();
+		})
+		.then((imageBlob) => {
+			const screenshot = document.getElementById("screenshot");
+			screenshot.setAttribute("src", URL.createObjectURL(imageBlob));
+			screenshot.style.display = "block";
+		})
+		.catch((error) => console.error(error));
 }
 
 /**
@@ -88,8 +89,8 @@ function displayImage(id) {
  * @param Element section
  */
 function resetList(section) {
-  const ul = section.getElementsByTagName('ul')[0];
-  ul.innerHTML = '';
+	const ul = section.getElementsByTagName("ul")[0];
+	ul.innerHTML = "";
 }
 
 /**
@@ -98,31 +99,34 @@ function resetList(section) {
  * @param any ecoindex
  */
 function makeList(section, ecoindex) {
-  const b = document.createElement('button');
-  b.style.backgroundColor = ecoindex.color;
-  b.style.color = '#FFF';
-  b.style.padding = '10px';
-  b.textContent = ecoindex.grade;
+	const b = document.createElement("button");
+	b.style.backgroundColor = ecoindex.color;
+	b.style.color = "#FFF";
+	b.style.padding = "10px";
+	b.textContent = ecoindex.grade;
 
-  const resultLink = document.createElement('a');
-  resultLink.appendChild(b);
-  resultLink.setAttribute('href', FETCH_RESULT_ECOINDEX_URL(ecoindex.id));
-  resultLink.setAttribute('target', '_blank');
+	const resultLink = document.createElement("a");
+	resultLink.appendChild(b);
+	resultLink.setAttribute("href", FETCH_RESULT_ECOINDEX_URL(ecoindex.id));
+	resultLink.setAttribute("target", "_blank");
 
-  const li = document.createElement('li');
-  li.style.listStyleType = 'none';
-  li.setAttribute('title', `(${ecoindex.score} / 100) le ${convertDate(ecoindex.date)}`);
-  li.appendChild(resultLink);
+	const li = document.createElement("li");
+	li.style.listStyleType = "none";
+	li.setAttribute(
+		"title",
+		`(${ecoindex.score} / 100) le ${convertDate(ecoindex.date)}`,
+	);
+	li.appendChild(resultLink);
 
-  const pageLink = document.createElement('a');
-  pageLink.textContent = ecoindex.url;
-  pageLink.setAttribute('href', ecoindex.url);
-  pageLink.style.paddingLeft = '5px';
-  pageLink.setAttribute('target', '_blank');
-  li.appendChild(pageLink);
+	const pageLink = document.createElement("a");
+	pageLink.textContent = ecoindex.url;
+	pageLink.setAttribute("href", ecoindex.url);
+	pageLink.style.paddingLeft = "5px";
+	pageLink.setAttribute("target", "_blank");
+	li.appendChild(pageLink);
 
-  const ul = section.getElementsByTagName('ul')[0];
-  ul.appendChild(li);
+	const ul = section.getElementsByTagName("ul")[0];
+	ul.appendChild(li);
 }
 
 /**
@@ -132,24 +136,24 @@ function makeList(section, ecoindex) {
  * @returns null
  */
 function setOtherResults(ecoindexData, tag) {
-  const section = document.getElementById(`${tag}-results`);
-  const data = ecoindexData[`${tag}-results`];
+	const section = document.getElementById(`${tag}-results`);
+	const data = ecoindexData[`${tag}-results`];
 
-  if ((data?.length || 0) === 0) {
-    return;
-  }
+	if ((data?.length || 0) === 0) {
+		return;
+	}
 
-  resetList(section);
+	resetList(section);
 
-  data.slice(-5).forEach((ecoindex) => {
-    makeList(section, ecoindex);
-  });
+	data.slice(-5).forEach((ecoindex) => {
+		makeList(section, ecoindex);
+	});
 
-  section.style.display = 'block';
+	section.style.display = "block";
 }
 
 async function updateLocalStorage(value) {
-  await setBadgeLocalStorage(tabUrl, value.color, value.grade);
+	await setBadgeLocalStorage(tabUrl, value.color, value.grade);
 }
 
 /**
@@ -157,33 +161,38 @@ async function updateLocalStorage(value) {
  * @param any ecoindexData results from the BFF API
  */
 function displayResult(ecoindexData) {
-  const latestResult = ecoindexData['latest-result'];
-  if (latestResult.id !== '') {
-    const dateResultElement = document.getElementById('result-date');
-    dateResultElement.textContent = convertDate(latestResult.date);
+	const latestResult = ecoindexData["latest-result"];
+	if (latestResult.id !== "") {
+		const dateResultElement = document.getElementById("result-date");
+		dateResultElement.textContent = convertDate(latestResult.date);
 
-    domTitle.textContent = 'Résultat pour cette page';
-    domTitle.style.display = 'block';
+		domTitle.textContent = "Résultat pour cette page";
+		domTitle.style.display = "block";
 
-    const activeLevelChart = document.querySelector(`[data-grade-result="${latestResult.grade}"]`);
-    activeLevelChart.classList.add('--active');
+		const activeLevelChart = document.querySelector(
+			`[data-grade-result="${latestResult.grade}"]`,
+		);
+		activeLevelChart.classList.add("--active");
 
-    const resultScore = document.getElementById('result-score');
-    resultScore.textContent = latestResult.score;
+		const resultScore = document.getElementById("result-score");
+		resultScore.textContent = latestResult.score;
 
-    const resultLink = document.getElementById('result-link');
-    resultLink.setAttribute('href', FETCH_RESULT_ECOINDEX_URL(latestResult.id));
+		const resultLink = document.getElementById("result-link");
+		resultLink.setAttribute("href", FETCH_RESULT_ECOINDEX_URL(latestResult.id));
 
-    document.getElementById('result').style.display = 'block';
-    displayImage(latestResult.id);
-    updateLocalStorage(latestResult);
-  }
+		document.getElementById("result").style.display = "block";
+		displayImage(latestResult.id);
+		updateLocalStorage(latestResult);
+	}
 
-  if (ecoindexData['older-results']?.length > 0 || ecoindexData['host-results']?.length > 0) {
-    document.getElementById('other-results').style.display = 'block';
-    setOtherResults(ecoindexData, 'older');
-    setOtherResults(ecoindexData, 'host');
-  }
+	if (
+		ecoindexData["older-results"]?.length > 0 ||
+		ecoindexData["host-results"]?.length > 0
+	) {
+		document.getElementById("other-results").style.display = "block";
+		setOtherResults(ecoindexData, "older");
+		setOtherResults(ecoindexData, "host");
+	}
 }
 
 /**
@@ -191,13 +200,16 @@ function displayResult(ecoindexData) {
  * @param any ecoindexData
  */
 function updatePopup(ecoindexData) {
-  if (ecoindexData.count === 0 && (ecoindexData['older-results']?.length || 0) === 0) {
-    proposeAnalysis('Aucune analyse pour ce site');
-  } else if (ecoindexData['latest-result'].id === '') {
-    proposeAnalysis('Aucune analyse pour cette page');
-  }
+	if (
+		ecoindexData.count === 0 &&
+		(ecoindexData["older-results"]?.length || 0) === 0
+	) {
+		proposeAnalysis("Aucune analyse pour ce site");
+	} else if (ecoindexData["latest-result"].id === "") {
+		proposeAnalysis("Aucune analyse pour cette page");
+	}
 
-  displayResult(ecoindexData);
+	displayResult(ecoindexData);
 }
 
 /**
@@ -205,56 +217,59 @@ function updatePopup(ecoindexData) {
  * @param string url
  */
 function getAndUpdateEcoindexData(url) {
-  fetch(FETCH_RESULT_URL(url, true))
-    .then((r) => r.json())
-    .then(updatePopup)
-    .catch(handleApiError);
+	fetch(FETCH_RESULT_URL(url, true))
+		.then((r) => r.json())
+		.then(updatePopup)
+		.catch(handleApiError);
 }
 
 const fetchWithRetries = async (url, options, retryCount = 0) => {
-  const { maxRetries = 30, ...remainingOptions } = options;
-  fetch(url, remainingOptions)
-    .then(async (r) => {
-      if (retryCount < maxRetries && r.status === 425) {
-        // eslint-disable-next-line no-promise-executor-return
-        await new Promise((t) => setTimeout(t, 2000));
-        await fetchWithRetries(url, options, retryCount + 1);
-      }
+	const { maxRetries = 30, ...remainingOptions } = options;
+	fetch(url, remainingOptions)
+		.then(async (r) => {
+			if (retryCount < maxRetries && r.status === 425) {
+				// eslint-disable-next-line no-promise-executor-return
+				await new Promise((t) => setTimeout(t, 2000));
+				await fetchWithRetries(url, options, retryCount + 1);
+			}
 
-      return r.json();
-    })
-    .then((taskResult) => {
-      if (taskResult === undefined) {
-        return;
-      }
+			return r.json();
+		})
+		.then((taskResult) => {
+			if (taskResult === undefined) {
+				return;
+			}
 
-      const ecoindex = taskResult.ecoindex_result;
+			const ecoindex = taskResult.ecoindex_result;
 
-      if (taskResult.status === 'SUCCESS' && ecoindex.status === 'SUCCESS') {
-        document.getElementById('loader').style.display = 'none';
-        document.getElementById('no-analysis').style.display = 'none';
+			if (taskResult.status === "SUCCESS" && ecoindex.status === "SUCCESS") {
+				document.getElementById("loader").style.display = "none";
+				document.getElementById("no-analysis").style.display = "none";
 
-        getAndUpdateEcoindexData(tabUrl);
-      }
+				getAndUpdateEcoindexData(tabUrl);
+			}
 
-      if (taskResult.status === 'SUCCESS' && ecoindex.status === 'FAILURE') {
-        const e = taskResult.ecoindex_result.error;
-        displayError(e.message, e.detail);
-      }
+			if (taskResult.status === "SUCCESS" && ecoindex.status === "FAILURE") {
+				const e = taskResult.ecoindex_result.error;
+				displayError(e.message, e.detail);
+			}
 
-      if (taskResult.status === 'FAILURE') {
-        displayError("Erreur lors de l'analyse de la page", taskResult.task_error);
-      }
-    })
-    .catch(async (err) => {
-      if (retryCount < maxRetries && err.status === 425) {
-        // eslint-disable-next-line no-promise-executor-return
-        await new Promise((r) => setTimeout(r, 2000));
-        await fetchWithRetries(url, options, retryCount + 1);
-      }
+			if (taskResult.status === "FAILURE") {
+				displayError(
+					"Erreur lors de l'analyse de la page",
+					taskResult.task_error,
+				);
+			}
+		})
+		.catch(async (err) => {
+			if (retryCount < maxRetries && err.status === 425) {
+				// eslint-disable-next-line no-promise-executor-return
+				await new Promise((r) => setTimeout(r, 2000));
+				await fetchWithRetries(url, options, retryCount + 1);
+			}
 
-      displayError('Erreur lors de l\'analyse de la page', err);
-    });
+			displayError("Erreur lors de l'analyse de la page", err);
+		});
 };
 
 /**
@@ -262,54 +277,59 @@ const fetchWithRetries = async (url, options, retryCount = 0) => {
  * @returns null
  */
 function resetDisplay() {
-  document.getElementById('loader').style.display = 'none';
-  document.getElementById('title').style.display = 'none';
-  document.getElementById('no-analysis').style.display = 'none';
-  document.getElementById('result').style.display = 'none';
-  document.getElementById('screenshot').style.display = 'none';
-  document.getElementById('other-results').style.display = 'none';
-  document.getElementById('older-results').style.display = 'none';
-  document.getElementById('host-results').style.display = 'none';
-  document.getElementById('error').style.display = 'none';
+	document.getElementById("loader").style.display = "none";
+	document.getElementById("title").style.display = "none";
+	document.getElementById("no-analysis").style.display = "none";
+	document.getElementById("result").style.display = "none";
+	document.getElementById("screenshot").style.display = "none";
+	document.getElementById("other-results").style.display = "none";
+	document.getElementById("older-results").style.display = "none";
+	document.getElementById("host-results").style.display = "none";
+	document.getElementById("error").style.display = "none";
 }
 
 /**
  * Call the API to run an analysis
  */
 async function runAnalysis() {
-  resetDisplay();
-  document.getElementById('loader').style.display = 'block';
+	resetDisplay();
+	document.getElementById("loader").style.display = "block";
 
-  fetch(FETCH_TASK_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      url: tabUrl,
-    }),
-  })
-    .then((r) => r.json())
-    .then(async (id) => {
-      await fetchWithRetries(FETCH_ID_TASK_URL(id), {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        method: 'GET',
-      });
-    });
+	fetch(FETCH_TASK_URL, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({
+			url: tabUrl,
+		}),
+	})
+		.then((r) => r.json())
+		.then(async (id) => {
+			await fetchWithRetries(FETCH_ID_TASK_URL(id), {
+				headers: {
+					"Content-Type": "application/json",
+				},
+				method: "GET",
+			});
+		});
 }
 
 resetDisplay();
 
-document.querySelector('#no-analysis button').addEventListener('click', runAnalysis);
-document.getElementById('retest').addEventListener('click', runAnalysis);
+document
+	.querySelector("#no-analysis button")
+	.addEventListener("click", runAnalysis);
+document.getElementById("retest").addEventListener("click", runAnalysis);
 
-currentBrowser.tabs.query({
-  active: true,
-  lastFocusedWindow: true,
-}, (tabs) => {
-  tabUrl = tabs[0].url;
+currentBrowser.tabs.query(
+	{
+		active: true,
+		lastFocusedWindow: true,
+	},
+	(tabs) => {
+		tabUrl = tabs[0].url;
 
-  getAndUpdateEcoindexData(tabUrl);
-});
+		getAndUpdateEcoindexData(tabUrl);
+	},
+);

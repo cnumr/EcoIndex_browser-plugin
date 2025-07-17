@@ -8,5 +8,8 @@
   "extends": "airbnb-base",
   "parserOptions": {
     "ecmaVersion": "latest"
+  },
+  "rules": {
+    "import/extensions": "off"
   }
 }
