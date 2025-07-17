@@ -1,0 +1,17 @@
+{
+    "name": "EcoIndex Browser Plugin DevContainer",
+    "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+    "features": {},
+    "postCreateCommand": "npm install",
+    "customizations": {
+        "vscode": {
+            "settings": {},
+            "extensions": [
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode"
+            ]
+        }
+    },
+    "forwardPorts": [],
+    "remoteUser": "node"
+}

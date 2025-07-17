@@ -17,21 +17,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vvatelot/ecoindex-chrome-plugin.git"
+    "url": "git+https://github.com/cnumr/EcoIndex_browser-plugin.git"
   },
   "author": "Vincent Vatelot <vincent.vatelot@ik.me>",
   "license": "Creative commons CC-By-NC-ND",
   "bugs": {
-    "url": "https://github.com/vvatelot/ecoindex-chrome-plugin/issues"
+    "url": "https://github.com/cnumr/EcoIndex_browser-plugin/issues"
   },
-  "homepage": "https://github.com/vvatelot/ecoindex-chrome-plugin",
+  "homepage": "https://github.com/cnumr/EcoIndex_browser-plugin",
   "devDependencies": {
-    "eslint": "^8.30.0",
+    "eslint": "^9.31.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.26.0"
+    "eslint-plugin-import": "^2.32.0"
   },
   "dependencies": {
-    "fs-extra": "^11.1.0",
-    "web-ext": "^7.4.0"
+    "fs-extra": "^11.3.0",
+    "web-ext": "^8.8.0"
   }
 }
