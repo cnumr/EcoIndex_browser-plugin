@@ -15,16 +15,6 @@
   "background": {
     "page": "background/background.html"
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "common.js"
-      ]
-    }
-  ],
   "permissions": [
     "activeTab",
     "https://bff.ecoindex.fr/*",

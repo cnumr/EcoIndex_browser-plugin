@@ -10,8 +10,8 @@
     "build:all": "npm run build:chrome && npm run build:firefox",
     "lint": "npm run manifest:tmp && npx eslint src && web-ext lint",
     "lint:fix": "npm run manifest:tmp && npx eslint src --fix && web-ext lint",
-    "start": "npm run manifest:tmp && web-ext run --firefox-preview",
-    "start:dev": "npm run manifest:tmp && web-ext run --devtools --firefox-preview",
+    "start": "npm run manifest:tmp && web-ext run",
+    "start:dev": "npm run manifest:tmp && web-ext run --devtools",
     "preVersion": "npm run manifest:tmp && npm run lint",
     "version": "npm run manifest:update"
   },
