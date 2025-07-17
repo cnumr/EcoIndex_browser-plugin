@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "🚀 Checkout"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "👷 Install dependencies"
         run: npm install
@@ -21,7 +21,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "Upload artifact"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: web-ext-artifacts
           path: web-ext-artifacts
@@ -32,7 +32,7 @@ jobs:
     needs: build
     steps:
       - name: "⬇️ Download artifacts"
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: web-ext-artifacts
 
@@ -54,7 +54,7 @@ jobs:
     needs: build
     steps:
       - name: "⬇️ Download Firefox artifact"
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: web-ext-artifacts
 
@@ -70,7 +70,7 @@ jobs:
     needs: build
     steps:
       - name: "⬇️ Download Chrome artifact"
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: web-ext-artifacts
 
