@@ -1,6 +1,6 @@
-import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import fs from "fs-extra";
 import webExt from "web-ext";
 
 const args = process.argv.slice(2);
