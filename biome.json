@@ -9,6 +9,8 @@
 		"ignoreUnknown": false,
 		"includes": [
 			"src/**/*.js",
+			"bin/**/*.mjs",
+			"web-ext-config.mjs",
 			"!node_modules/**",
 			"!dist/**",
 			"!build/**",
