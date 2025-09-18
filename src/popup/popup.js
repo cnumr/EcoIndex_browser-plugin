@@ -122,8 +122,15 @@ function makeList(section, ecoindex) {
 	pageLink.textContent = ecoindex.url;
 	pageLink.setAttribute("href", ecoindex.url);
 	pageLink.style.paddingLeft = "5px";
+	pageLink.style.textDecoration = "none";
 	pageLink.setAttribute("target", "_blank");
 	li.appendChild(pageLink);
+
+	const pageLinkDate = document.createElement("span");
+	pageLinkDate.style.fontSize = "0.8rem";
+	pageLinkDate.textContent = `(${convertDate(ecoindex.date)})`;
+	pageLinkDate.style.paddingLeft = "5px";
+	pageLink.appendChild(pageLinkDate);
 
 	const ul = section.getElementsByTagName("ul")[0];
 	ul.appendChild(li);
