@@ -4,7 +4,7 @@
 
 These Terms of Use govern the use of the **Ecoindex Browser Extension** (hereinafter “the Extension”).
 
-The Extension provides the Ecoindex score of a web page by querying a dedicated backend service (Ecoindex BFF).
+The Extension provides the Ecoindex score of a web page by querying a dedicated backend service ([Ecoindex BFF](https://github.com/cnumr/EcoIndex_BFF) which is a Ecoindex official API middleware).
 
 ---
 
