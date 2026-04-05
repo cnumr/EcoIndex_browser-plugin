@@ -30,6 +30,6 @@
   },
   "dependencies": {
     "fs-extra": "^11.3.0",
-    "web-ext": "^8.8.0"
+    "web-ext": "^8.10.0"
   }
 }
