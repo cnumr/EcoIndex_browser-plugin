@@ -28,7 +28,7 @@ When the Extension is active on a web page:
 Results are stored in an encrypted manner using the following scheme:
 
 * Key: `ecoindex_sha1(url)`
-* Value: associated Ecoindex score
+* Value: associated Ecoindex data result
 
 No plain-text URL is stored in this caching mechanism.
 
