@@ -1,0 +1,67 @@
+@import url("../popup/popup.css");
+
+body.options-page.container {
+	width: min(100vw - 2.5rem, 40rem);
+	max-width: 40rem;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.options-field {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--s1);
+	margin: var(--s2) 0;
+}
+
+.options-field input[type="checkbox"] {
+	margin-top: 0.35rem;
+	flex-shrink: 0;
+}
+
+.options-field label {
+	cursor: pointer;
+	font-weight: var(--font-weight-normal);
+}
+
+.options-meta {
+	margin-top: var(--s3);
+	font-size: var(--s1);
+	opacity: 0.9;
+}
+
+.options-links a {
+	color: var(--color-lightest);
+}
+
+#options-status {
+	min-height: 1.5em;
+	margin-top: var(--s1);
+	font-size: var(--s-1);
+}
+
+.options-code {
+	font-family: var(--font-mono);
+	font-size: 0.85rem;
+	padding: var(--s1);
+	background: var(--color-dark);
+	color: var(--color-light);
+	border-radius: var(--border-radius-small);
+	overflow-x: auto;
+	white-space: pre-wrap;
+	word-break: break-word;
+	line-height: 1.45;
+}
+
+.options-perms-list {
+	padding-left: 1.25rem;
+	margin: var(--s1) 0;
+}
+
+.options-perms-list li {
+	margin-bottom: var(--s1);
+}
+
+.options-perms-list li:last-child {
+	margin-bottom: 0;
+}

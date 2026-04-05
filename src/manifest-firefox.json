@@ -20,5 +20,9 @@
     "https://bff.ecoindex.fr/*",
     "storage",
     "tabs"
-  ]
+  ],
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  }
 }
