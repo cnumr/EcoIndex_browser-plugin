@@ -9,8 +9,17 @@ import {
 } from "../common.js";
 
 let tabUrl;
+/** @type {{ showScreenshot: boolean }} */
+let options = { showScreenshot: true };
 const domTitle = document.getElementById("title");
 const currentBrowser = getBrowserPolyfill();
+
+async function loadOptions() {
+	const stored = await currentBrowser.storage.local.get({
+		ecoindex_options: { showScreenshot: true },
+	});
+	options = { ...stored.ecoindex_options };
+}
 
 /**
  * display error message
@@ -188,7 +197,9 @@ function displayResult(ecoindexData) {
 		resultLink.setAttribute("href", FETCH_RESULT_ECOINDEX_URL(latestResult.id));
 
 		document.getElementById("result").style.display = "block";
-		displayImage(latestResult.id);
+		if (options.showScreenshot) {
+			displayImage(latestResult.id);
+		}
 		updateLocalStorage(latestResult);
 	}
 
@@ -324,19 +335,23 @@ async function runAnalysis() {
 
 resetDisplay();
 
-document
-	.querySelector("#no-analysis button")
-	.addEventListener("click", runAnalysis);
-document.getElementById("retest").addEventListener("click", runAnalysis);
+loadOptions()
+	.then(() => {
+		document
+			.querySelector("#no-analysis button")
+			.addEventListener("click", runAnalysis);
+		document.getElementById("retest").addEventListener("click", runAnalysis);
 
-currentBrowser.tabs.query(
-	{
-		active: true,
-		lastFocusedWindow: true,
-	},
-	(tabs) => {
-		tabUrl = tabs[0].url;
+		currentBrowser.tabs.query(
+			{
+				active: true,
+				lastFocusedWindow: true,
+			},
+			(tabs) => {
+				tabUrl = tabs[0].url;
 
-		getAndUpdateEcoindexData(tabUrl);
-	},
-);
+				getAndUpdateEcoindexData(tabUrl);
+			},
+		);
+	})
+	.catch(console.error);
