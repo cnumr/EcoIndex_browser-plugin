@@ -38,17 +38,15 @@ Le fichier manifeste de l’Extension peut contenir les déclarations suivantes,
 ```json
 {
   "permissions": ["activeTab", "storage"],
-  "host_permissions": ["<all_urls>"]
+  "host_permissions": ["https://bff.ecoindex.fr/*"]
 }
 ```
 
-- **`activeTab`** — Accorde un accès **temporaire** à l’onglet actif lorsque vous utilisez l’Extension (par exemple à l’ouverture de la popup). Elle sert à lire **l’URL de la page affichée** afin d’interroger le backend Ecoindex pour le résultat correspondant. Elle **ne** permet pas de lire en continu tous les onglets en arrière-plan.
+- **`activeTab`** — Accorde un accès **temporaire** à l’onglet actif lorsque vous ouvrez la popup de l’Extension. Elle sert à lire **l’URL de la page affichée** afin d’interroger le backend Ecoindex pour le résultat correspondant. Elle **ne** permet pas de lire en continu tous les onglets en arrière-plan.
 
-- **`storage`** — Sert à conserver **localement sur votre appareil** des données d’Extension : préférences et état d’interface de courte durée (par exemple le badge de la barre d’outils lié à l’onglet courant). Ce stockage n’est pas utilisé pour constituer un historique de navigation exploité par des tiers.
+- **`storage`** — Sert à conserver **localement sur votre appareil** les préférences de l’Extension. Ce stockage n’est pas utilisé pour constituer un historique de navigation exploité par des tiers.
 
-- **`host_permissions` : `<all_urls>`** — Indique que l’Extension peut **s’exécuter dans le contexte des pages web sur les sites que vous visitez**. Ce schéma est en particulier nécessaire lorsque l’Extension injecte des **scripts de contenu** sur toutes les pages (par exemple pour partager du code avec la popup) ou lorsque le navigateur associe ce type d’injection à des autorisations d’hôtes larges. **Il ne s’agit pas d’un dispositif de suivi comportemental** : l’objectif reste d’obtenir l’URL de la page pour la requête Ecoindex décrite ci-dessus. Lorsque les politiques des magasins d’extensions le permettent, l’**accès réseau** au backend est limité à l’API officielle Ecoindex (`https://bff.ecoindex.fr/`) plutôt qu’à des sites arbitraires.
-
-Certaines versions peuvent aussi demander la permission **`tabs`** pour que la partie « arrière-plan » réagisse aux changements d’onglet ou de chargement de page, toujours dans le même objectif (par exemple mettre à jour le badge pour l’onglet actif).
+- **`host_permissions` : `https://bff.ecoindex.fr/*`** — Autorise uniquement les appels réseau vers l’API officielle Ecoindex BFF. Aucun accès hôte large de type `<all_urls>` n’est demandé.
 
 ---
 

@@ -28,12 +28,12 @@
 		<p>L’Extension peut déclarer dans son manifeste :</p>
 		<pre class="options-code" id="options-perms-snippet" aria-label="Exemple de permissions manifeste">{
   "permissions": ["activeTab", "storage"],
-  "host_permissions": ["&lt;all_urls&gt;"]
+  "host_permissions": ["https://bff.ecoindex.fr/*"]
 }</pre>
 		<ul class="options-perms-list">
-			<li><strong>activeTab</strong> — Accès <strong>temporaire</strong> à l’onglet actif quand vous ouvrez la popup (ou utilisez l’Extension), pour lire l’URL de la page et interroger le service Ecoindex. Pas de lecture continue de tous les onglets.</li>
-			<li><strong>storage</strong> — Stockage <strong>local</strong> des préférences et d’un état d’affichage de courte durée (par ex. badge), sur votre appareil.</li>
-			<li><strong>host_permissions &lt;all_urls&gt;</strong> — Autorise l’Extension à s’exécuter sur les pages que vous visitez (notamment si des scripts de contenu sont injectés partout). Ce n’est <strong>pas</strong> utilisé pour du pistage publicitaire ; l’URL sert à demander le score Ecoindex. L’accès réseau vers le backend peut être limité à <code>https://bff.ecoindex.fr/</code> selon la version du manifeste.</li>
+			<li><strong>activeTab</strong> — Accès <strong>temporaire</strong> à l’onglet actif lorsque vous ouvrez la popup pour récupérer l’URL affichée et demander le score Ecoindex correspondant.</li>
+			<li><strong>storage</strong> — Stockage <strong>local</strong> des préférences de l’extension sur votre appareil.</li>
+			<li><strong>host_permissions https://bff.ecoindex.fr/*</strong> — Autorise uniquement les appels réseau vers l’API officielle Ecoindex BFF. Aucun accès hôte large de type <code>&lt;all_urls&gt;</code> n’est demandé.</li>
 		</ul>
 		<p class="options-meta">Détail : voir la politique de confidentialité du projet (<code>doc/PRIVACY-POLICY-FR.md</code> ou <code>doc/PRIVACY-POLICY.md</code>).</p>
 	</section>

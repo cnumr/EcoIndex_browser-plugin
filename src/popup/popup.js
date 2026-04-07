@@ -5,7 +5,6 @@ import {
 	FETCH_SCREENSHOT_URL,
 	FETCH_TASK_URL,
 	getBrowserPolyfill,
-	setBadgeLocalStorage,
 } from "../common.js";
 
 let tabUrl;
@@ -13,6 +12,12 @@ let tabUrl;
 let options = { showScreenshot: true };
 const domTitle = document.getElementById("title");
 const currentBrowser = getBrowserPolyfill();
+const badgeIntegrationElement = document.getElementById("badge-integration");
+const badgeSnippetElement = document.getElementById("badge-snippet");
+const badgeThemeElement = document.getElementById("badge-theme");
+const badgePreviewLinkElement = document.getElementById("badge-preview-link");
+const badgePreviewImgElement = document.getElementById("badge-preview-img");
+let shouldRefreshBadgePreview = false;
 
 async function loadOptions() {
 	const stored = await currentBrowser.storage.local.get({
@@ -168,10 +173,6 @@ function setOtherResults(ecoindexData, tag) {
 	section.style.display = "block";
 }
 
-async function updateLocalStorage(value) {
-	await setBadgeLocalStorage(tabUrl, value.color, value.grade);
-}
-
 /**
  * Display the result of the analysis using data from the API
  * @param any ecoindexData results from the BFF API
@@ -197,10 +198,12 @@ function displayResult(ecoindexData) {
 		resultLink.setAttribute("href", FETCH_RESULT_ECOINDEX_URL(latestResult.id));
 
 		document.getElementById("result").style.display = "block";
+		badgeIntegrationElement.style.display = "block";
+		updateBadgeSnippet(tabUrl, getBadgeTheme(), shouldRefreshBadgePreview);
+		shouldRefreshBadgePreview = false;
 		if (options.showScreenshot) {
 			displayImage(latestResult.id);
 		}
-		updateLocalStorage(latestResult);
 	}
 
 	if (
@@ -228,6 +231,29 @@ function updatePopup(ecoindexData) {
 	}
 
 	displayResult(ecoindexData);
+}
+
+/**
+ * Build and display a reusable Ecoindex badge snippet for the current URL.
+ * @param {string} url
+ * @param {"light" | "dark"} theme
+ * @param {boolean} refreshPreview
+ */
+function updateBadgeSnippet(url, theme = "light", refreshPreview = false) {
+	const redirectUrl = `https://bff.ecoindex.fr/redirect/?url=${url}`;
+	const badgeUrl = `https://bff.ecoindex.fr/badge/?theme=${theme}&url=${url}`;
+	const previewUrl = refreshPreview
+		? `${badgeUrl}&refresh=true&_ts=${Date.now()}`
+		: badgeUrl;
+	badgeSnippetElement.textContent = `<a href="${redirectUrl}" target="_blank">
+    <img src="${badgeUrl}" alt="Ecoindex Badge" />
+</a>`;
+	badgePreviewLinkElement.setAttribute("href", redirectUrl);
+	badgePreviewImgElement.setAttribute("src", previewUrl);
+}
+
+function getBadgeTheme() {
+	return badgeThemeElement.value === "dark" ? "dark" : "light";
 }
 
 /**
@@ -304,6 +330,7 @@ function resetDisplay() {
 	document.getElementById("older-results").style.display = "none";
 	document.getElementById("host-results").style.display = "none";
 	document.getElementById("error").style.display = "none";
+	badgeIntegrationElement.style.display = "none";
 }
 
 /**
@@ -312,6 +339,7 @@ function resetDisplay() {
 async function runAnalysis() {
 	resetDisplay();
 	document.getElementById("loader").style.display = "block";
+	shouldRefreshBadgePreview = true;
 
 	fetch(FETCH_TASK_URL, {
 		method: "POST",
@@ -319,7 +347,11 @@ async function runAnalysis() {
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify({
-			url: tabUrl,
+			web_page: {
+				width: 1920,
+				height: 1080,
+				url: tabUrl,
+			},
 		}),
 	})
 		.then((r) => r.json())
@@ -341,6 +373,9 @@ loadOptions()
 			.querySelector("#no-analysis button")
 			.addEventListener("click", runAnalysis);
 		document.getElementById("retest").addEventListener("click", runAnalysis);
+		badgeThemeElement.addEventListener("change", () => {
+			updateBadgeSnippet(tabUrl, getBadgeTheme());
+		});
 
 		currentBrowser.tabs.query(
 			{
@@ -349,6 +384,7 @@ loadOptions()
 			},
 			(tabs) => {
 				tabUrl = tabs[0].url;
+				updateBadgeSnippet(tabUrl, getBadgeTheme());
 
 				getAndUpdateEcoindexData(tabUrl);
 			},
