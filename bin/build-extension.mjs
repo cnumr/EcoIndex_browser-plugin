@@ -30,10 +30,6 @@ async function buildForBrowser(browser) {
 		`${dirname}/../dist/${browser}/images`,
 	);
 	fs.copySync(
-		`${dirname}/../src/background`,
-		`${dirname}/../dist/${browser}/background`,
-	);
-	fs.copySync(
 		`${dirname}/../src/common.js`,
 		`${dirname}/../dist/${browser}/common.js`,
 	);

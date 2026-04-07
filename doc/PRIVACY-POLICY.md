@@ -38,17 +38,15 @@ The extension manifest may include the following declarations and use them only 
 ```json
 {
   "permissions": ["activeTab", "storage"],
-  "host_permissions": ["<all_urls>"]
+  "host_permissions": ["https://bff.ecoindex.fr/*"]
 }
 ```
 
-- **`activeTab`** — Grants **temporary** access to the active tab when you interact with the extension (for example when you open the toolbar popup). The extension uses this to read the **URL of the page you are viewing** so it can request the corresponding Ecoindex result from the backend. It does **not** give ongoing read access to all tabs in the background.
+- **`activeTab`** — Grants **temporary** access to the active tab when you open the extension popup. The extension uses this to read the **URL of the page you are viewing** so it can request the corresponding Ecoindex result from the backend. It does **not** give ongoing read access to all tabs in the background.
 
-- **`storage`** — Used to keep **local data on your device**: extension preferences and short-lived UI state (for example toolbar badge information tied to the current tab). This storage is not used to build a browsing history for third parties.
+- **`storage`** — Used to keep **local data on your device**: extension preferences. This storage is not used to build a browsing history for third parties.
 
-- **`host_permissions`: `<all_urls>`** — Declares that the extension may **run in the context of web pages on any site** you visit. This pattern is required when the extension uses **content scripts** injected on all pages (for example to share helpers with the popup) or when the browser ties injection to broad host permissions. **This is not used for behavioural tracking**: the goal remains to obtain the current page URL for the Ecoindex query described above. Where store policies allow, **network** access to the backend is kept to the official Ecoindex API host (`https://bff.ecoindex.fr/`) rather than arbitrary sites.
-
-Some builds may also request **`tabs`** so the background logic can react when you switch tabs or load a page, still in line with the same purpose (updating the badge for the active tab).
+- **`host_permissions`: `https://bff.ecoindex.fr/*`** — Allows network requests only to the official Ecoindex BFF API. No broad host access such as `<all_urls>` is requested.
 
 ---
 
