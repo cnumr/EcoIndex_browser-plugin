@@ -778,3 +778,27 @@ summary {
   max-width: 100%;
   height: auto;
 }
+
+.result-item {
+  list-style: none;
+  margin: 0.6rem 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.result-item-text {
+  min-width: 0;
+}
+
+.result-item-link {
+  display: block;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.result-item-date {
+  display: block;
+  font-size: 0.8rem;
+}

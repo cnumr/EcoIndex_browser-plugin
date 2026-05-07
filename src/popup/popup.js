@@ -125,7 +125,7 @@ function makeList(section, ecoindex) {
 	resultLink.setAttribute("target", "_blank");
 
 	const li = document.createElement("li");
-	li.style.listStyleType = "none";
+	li.classList.add("result-item");
 	li.setAttribute(
 		"title",
 		`(${ecoindex.score} / 100) le ${convertDate(ecoindex.date)}`,
@@ -135,16 +135,18 @@ function makeList(section, ecoindex) {
 	const pageLink = document.createElement("a");
 	pageLink.textContent = ecoindex.url;
 	pageLink.setAttribute("href", ecoindex.url);
-	pageLink.style.paddingLeft = "5px";
-	pageLink.style.textDecoration = "none";
 	pageLink.setAttribute("target", "_blank");
-	li.appendChild(pageLink);
+	pageLink.classList.add("result-item-link");
 
 	const pageLinkDate = document.createElement("span");
-	pageLinkDate.style.fontSize = "0.8rem";
 	pageLinkDate.textContent = `(${convertDate(ecoindex.date)})`;
-	pageLinkDate.style.paddingLeft = "5px";
-	pageLink.appendChild(pageLinkDate);
+	pageLinkDate.classList.add("result-item-date");
+
+	const itemTextWrapper = document.createElement("div");
+	itemTextWrapper.classList.add("result-item-text");
+	itemTextWrapper.appendChild(pageLink);
+	itemTextWrapper.appendChild(pageLinkDate);
+	li.appendChild(itemTextWrapper);
 
 	const ul = section.getElementsByTagName("ul")[0];
 	ul.appendChild(li);
