@@ -726,6 +726,12 @@ body {
   animation: 10s lineGrow linear infinite;
 }
 
+.queue-status {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  min-height: 1.5em;
+}
+
 @keyframes lineGrow {
   to {
     background-size: 100% auto;

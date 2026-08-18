@@ -271,52 +271,63 @@ function getAndUpdateEcoindexData(url) {
 
 const fetchWithRetries = async (url, options, retryCount = 0) => {
 	const { maxRetries = 30, ...remainingOptions } = options;
-	fetch(url, remainingOptions)
-		.then(async (r) => {
-			if (retryCount < maxRetries && r.status === 425) {
-				// eslint-disable-next-line no-promise-executor-return
-				await new Promise((t) => setTimeout(t, 2000));
-				await fetchWithRetries(url, options, retryCount + 1);
-			}
+	try {
+		const response = await fetch(url, remainingOptions);
+		const taskResult = await response.json();
 
-			return r.json();
-		})
-		.then((taskResult) => {
-			if (taskResult === undefined) {
-				return;
-			}
+		if (retryCount < maxRetries && response.status === 425) {
+			updateQueueStatus(taskResult);
+			await new Promise((resolve) => setTimeout(resolve, 2000));
+			return fetchWithRetries(url, options, retryCount + 1);
+		}
 
-			const ecoindex = taskResult.ecoindex_result;
+		return taskResult;
+	} catch (err) {
+		if (retryCount < maxRetries && err.status === 425) {
+			await new Promise((resolve) => setTimeout(resolve, 2000));
+			return fetchWithRetries(url, options, retryCount + 1);
+		}
 
-			if (taskResult.status === "SUCCESS" && ecoindex.status === "SUCCESS") {
-				document.getElementById("loader").style.display = "none";
-				document.getElementById("no-analysis").style.display = "none";
-
-				getAndUpdateEcoindexData(tabUrl);
-			}
-
-			if (taskResult.status === "SUCCESS" && ecoindex.status === "FAILURE") {
-				const e = taskResult.ecoindex_result.error;
-				displayError(e.message, e.detail);
-			}
-
-			if (taskResult.status === "FAILURE") {
-				displayError(
-					"Erreur lors de l'analyse de la page",
-					taskResult.task_error,
-				);
-			}
-		})
-		.catch(async (err) => {
-			if (retryCount < maxRetries && err.status === 425) {
-				// eslint-disable-next-line no-promise-executor-return
-				await new Promise((r) => setTimeout(r, 2000));
-				await fetchWithRetries(url, options, retryCount + 1);
-			}
-
-			displayError("Erreur lors de l'analyse de la page", err);
-		});
+		displayError("Erreur lors de l'analyse de la page", err);
+	}
 };
+
+/**
+ * Display queue position while an analysis task is still pending
+ * @param {{ queue_position?: number | null, tasks_in_progress?: number }} task
+ */
+function updateQueueStatus(task = {}) {
+	const el = document.getElementById("queue-status");
+	if (!el) {
+		return;
+	}
+
+	const queuePosition = task.queue_position;
+	const tasksInProgress = task.tasks_in_progress;
+	const parts = [];
+
+	if (queuePosition === 0) {
+		parts.push("Vous êtes le prochain dans la file d’attente.");
+	} else if (typeof queuePosition === "number") {
+		parts.push(
+			queuePosition === 1
+				? "Il y a 1 analyse avant la vôtre."
+				: `Il y a ${queuePosition} analyses avant la vôtre.`,
+		);
+	} else {
+		parts.push("C’est votre tour, l’analyse est en cours.");
+	}
+
+	if (typeof tasksInProgress === "number" && tasksInProgress > 0) {
+		parts.push(
+			tasksInProgress === 1
+				? "1 analyse actuellement en cours."
+				: `${tasksInProgress} analyses actuellement en cours.`,
+		);
+	}
+
+	el.textContent = parts.join(" ");
+}
 
 /**
  * Reset the display
@@ -324,6 +335,7 @@ const fetchWithRetries = async (url, options, retryCount = 0) => {
  */
 function resetDisplay() {
 	document.getElementById("loader").style.display = "none";
+	document.getElementById("queue-status").textContent = "";
 	document.getElementById("title").style.display = "none";
 	document.getElementById("no-analysis").style.display = "none";
 	document.getElementById("result").style.display = "none";
@@ -358,12 +370,37 @@ async function runAnalysis() {
 	})
 		.then((r) => r.json())
 		.then(async (id) => {
-			await fetchWithRetries(FETCH_ID_TASK_URL(id), {
+			const taskResult = await fetchWithRetries(FETCH_ID_TASK_URL(id), {
 				headers: {
 					"Content-Type": "application/json",
 				},
 				method: "GET",
 			});
+
+			if (taskResult === undefined) {
+				return;
+			}
+
+			const ecoindex = taskResult.ecoindex_result;
+
+			if (taskResult.status === "SUCCESS" && ecoindex?.status === "SUCCESS") {
+				document.getElementById("loader").style.display = "none";
+				document.getElementById("no-analysis").style.display = "none";
+
+				getAndUpdateEcoindexData(tabUrl);
+			}
+
+			if (taskResult.status === "SUCCESS" && ecoindex?.status === "FAILURE") {
+				const e = taskResult.ecoindex_result.error;
+				displayError(e.message, e.detail);
+			}
+
+			if (taskResult.status === "FAILURE") {
+				displayError(
+					"Erreur lors de l'analyse de la page",
+					taskResult.task_error,
+				);
+			}
 		});
 }
 
