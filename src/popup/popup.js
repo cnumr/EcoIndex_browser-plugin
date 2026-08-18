@@ -366,6 +366,7 @@ async function runAnalysis() {
 				height: 1080,
 				url: tabUrl,
 			},
+			include_requests_detail: true,
 		}),
 	})
 		.then((r) => r.json())
