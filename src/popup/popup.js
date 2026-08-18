@@ -19,6 +19,93 @@ const badgePreviewLinkElement = document.getElementById("badge-preview-link");
 const badgePreviewImgElement = document.getElementById("badge-preview-img");
 let shouldRefreshBadgePreview = false;
 
+const ANALYSIS_ERROR_DEFAULT = "Veuillez réessayer plus tard";
+const ANALYSIS_ERROR_403_EXCLUDED =
+	"Ce nom de domaine est exclu des analyses EcoIndex.";
+const ANALYSIS_ERROR_MESSAGES = {
+	400: "Cette URL est injoignable. Vérifiez l’adresse saisie (faute de frappe, site hors ligne, nom de domaine inexistant…) puis réessayez.",
+	401: "Cette page nécessite une authentification. EcoIndex ne peut analyser que des pages accessibles publiquement.",
+	403: "L’accès à cette page a été refusé. Le site bloque probablement l’analyse (protection antibot, accès interdit). Vous pouvez réessayer plus tard, ou tester une autre page.",
+	404: "Analyse introuvable.",
+	422: "Un paramètre n’est pas valide, pouvez-vous vérifier votre requête ?",
+	429: "Vous avez atteint la limite de ##daily_limit_per_host## appels par jour pour le nom de domaine ##host##.",
+	500: "Une erreur inattendue s’est produite pendant l’analyse. Le problème est généralement temporaire : veuillez réessayer dans quelques instants.",
+	502: "L’url demandée n’est pas valide. Veuillez vérifier l’URL et réessayer.",
+	504: "La page web indiquée ne semble pas répondre. Pouvez vous réessayer plus tard ?",
+	520: "Cette ressource n’est pas une page HTML (fichier PDF, image, JSON, etc.). EcoIndex ne peut analyser que des pages web au format HTML.",
+	521: "La page n’a pas pu être analysée car le serveur n’a pas renvoyé un code HTTP 200. Elle est peut-être introuvable, protégée, en redirection ou temporairement en erreur.",
+};
+
+function isScalar(value) {
+	return (
+		typeof value === "string" ||
+		typeof value === "number" ||
+		typeof value === "boolean"
+	);
+}
+
+function flattenDetails(details) {
+	if (details == null || typeof details !== "object") {
+		return {};
+	}
+
+	const interpolations = {};
+	for (const [key, value] of Object.entries(details)) {
+		if (value != null && typeof value === "object" && !Array.isArray(value)) {
+			for (const [nestedKey, nestedValue] of Object.entries(value)) {
+				if (isScalar(nestedValue)) {
+					interpolations[nestedKey] = String(nestedValue);
+				}
+			}
+		} else if (isScalar(value)) {
+			interpolations[key] = String(value);
+		}
+	}
+	return interpolations;
+}
+
+function isExcludedHost(details) {
+	const text =
+		typeof details === "string"
+			? details
+			: (details?.detail ?? details?.message ?? "");
+	return String(text).toLowerCase().includes("excluded");
+}
+
+function stringifyErrorDetail(detail) {
+	if (detail == null || detail === "") {
+		return "";
+	}
+	if (typeof detail === "string") {
+		return detail;
+	}
+	try {
+		return JSON.stringify(detail, null, 2);
+	} catch {
+		return String(detail);
+	}
+}
+
+/**
+ * User-facing analysis error message from an API status code.
+ * @param {number|string|undefined} errorCode
+ * @param {unknown} details
+ * @returns {string}
+ */
+function getAnalysisErrorMessage(errorCode, details) {
+	const code = Number(errorCode);
+	let message =
+		code === 403 && isExcludedHost(details)
+			? ANALYSIS_ERROR_403_EXCLUDED
+			: ANALYSIS_ERROR_MESSAGES[code] || ANALYSIS_ERROR_DEFAULT;
+
+	for (const [key, value] of Object.entries(flattenDetails(details))) {
+		message = message.replaceAll(`##${key}##`, value);
+	}
+
+	return message;
+}
+
 async function loadOptions() {
 	const stored = await currentBrowser.storage.local.get({
 		ecoindex_options: { showScreenshot: true },
@@ -273,12 +360,23 @@ const fetchWithRetries = async (url, options, retryCount = 0) => {
 	const { maxRetries = 30, ...remainingOptions } = options;
 	try {
 		const response = await fetch(url, remainingOptions);
-		const taskResult = await response.json();
+		const taskResult = await response.json().catch(() => null);
 
 		if (retryCount < maxRetries && response.status === 425) {
 			updateQueueStatus(taskResult);
 			await new Promise((resolve) => setTimeout(resolve, 2000));
 			return fetchWithRetries(url, options, retryCount + 1);
+		}
+
+		if (!response.ok) {
+			displayError(
+				getAnalysisErrorMessage(
+					response.status,
+					taskResult?.detail ?? taskResult,
+				),
+				stringifyErrorDetail(taskResult?.detail ?? taskResult),
+			);
+			return;
 		}
 
 		return taskResult;
@@ -288,7 +386,10 @@ const fetchWithRetries = async (url, options, retryCount = 0) => {
 			return fetchWithRetries(url, options, retryCount + 1);
 		}
 
-		displayError("Erreur lors de l'analyse de la page", err);
+		displayError(
+			getAnalysisErrorMessage(err.status, err),
+			stringifyErrorDetail(err?.message ?? err),
+		);
 	}
 };
 
@@ -369,8 +470,22 @@ async function runAnalysis() {
 			include_requests_detail: true,
 		}),
 	})
-		.then((r) => r.json())
+		.then(async (response) => {
+			const body = await response.json().catch(() => null);
+			if (!response.ok) {
+				displayError(
+					getAnalysisErrorMessage(response.status, body?.detail ?? body),
+					stringifyErrorDetail(body?.detail ?? body),
+				);
+				return;
+			}
+			return body;
+		})
 		.then(async (id) => {
+			if (id == null) {
+				return;
+			}
+
 			const taskResult = await fetchWithRetries(FETCH_ID_TASK_URL(id), {
 				headers: {
 					"Content-Type": "application/json",
@@ -393,16 +508,20 @@ async function runAnalysis() {
 
 			if (taskResult.status === "SUCCESS" && ecoindex?.status === "FAILURE") {
 				const e = taskResult.ecoindex_result.error;
-				displayError(e.message, e.detail);
+				displayError(
+					getAnalysisErrorMessage(e.status_code, e),
+					stringifyErrorDetail(e.detail ?? e.message),
+				);
 			}
 
 			if (taskResult.status === "FAILURE") {
 				displayError(
-					"Erreur lors de l'analyse de la page",
-					taskResult.task_error,
+					getAnalysisErrorMessage(500, taskResult.task_error),
+					stringifyErrorDetail(taskResult.task_error),
 				);
 			}
-		});
+		})
+		.catch(handleApiError);
 }
 
 resetDisplay();
