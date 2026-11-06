@@ -468,6 +468,7 @@ async function runAnalysis() {
 				url: tabUrl,
 			},
 			include_requests_detail: true,
+			include_best_practices: true,
 		}),
 	})
 		.then(async (response) => {
